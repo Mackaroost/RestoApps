@@ -1,6 +1,7 @@
 "use client"
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import BtnBack from "../componentes/BtnBack";
 interface IdProps {
    params:{
      id:string
@@ -14,7 +15,7 @@ interface CategoriesDescription {
     strMealThumb: string;
     strInstructions:string;
   }
-const Page = ({params}:IdProps) => {
+const PageId = ({params}:IdProps) => {
     const[dataId, setDataId]= useState< CategoriesDescription[]>([])
     const { id } = params;
     //console.log(params)
@@ -37,12 +38,16 @@ const Page = ({params}:IdProps) => {
     }, [])
 
   return (
-    <main className="container mx-auto min-h-screen py-4">
+<main className="container mx-auto min-h-screen py-4">
+        
+            <BtnBack/>
+        
+        
         <p className="text-3xl text-center py-10 font-bol"> Nuestra Recetas </p>
-        {
+        {    
             dataId.map((item)=>{
                 return (
-                    <article key ={item.idMeal} className="mx-auto flex flex-col justify-center items-center rounded-md shadow-md p-4 pt-4 bg-slate-500 w-2/5">
+                    <article key ={item.idMeal} className="mx-auto flex flex-col justify-center items-center rounded-md shadow-md p-4 pt-4 bg-slate-500 md:w-2/5">
             <Image 
             className="w-full object-cover rounded-md"
               src={item.strMealThumb} 
@@ -66,4 +71,4 @@ const Page = ({params}:IdProps) => {
   )
 }
 
-export default Page
+export default PageId

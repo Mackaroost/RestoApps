@@ -3,6 +3,7 @@ import { getCategory } from '../api';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from "next/navigation"
 
 interface CategoriesList {
   idCategory: string;
@@ -14,11 +15,16 @@ interface CategoriesDescription {
   strMeal: string;
   strMealThumb: string;
 }
-
+interface Area{
+  strArea:string
+}
 export default function Home() {
   const [listCategories, setListCategories] = useState<CategoriesList[]>([]);
   const [selectCategory, setSelectCategory] = useState('');
   const [dataCategory, setDataCategory] = useState<CategoriesDescription[]>([]);
+  const [area, setArea] = useState<Area[]>([])
+  const [selectArea, setSelectArea] = useState('')
+  const router = useRouter()
 
   useEffect(() => {
     const fetchListCategories = async () => {
@@ -47,18 +53,62 @@ export default function Home() {
       fetchCategoriesSelect();
     }
   }, [selectCategory]);
+  
+  useEffect(() => {
+    const fetchByArea = async ()=>{
+      try {
+        const res = await fetch(`https://www.themealdb.com/api/json/v1/1/list.php?a=list`)
+          const data = await res.json();
+          //console.log(data)
+          setArea(data.meals || []);
+          //console.log(area)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    fetchByArea()
+  },[])
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectCategory(e.target.value);
   };
 
+  const handleChangeArea = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectArea(e.target.value);
+    if(selectArea){
+      router.push(`/${selectArea}`)
+    }
+
+  };
+
   return (
-    <main>
+      <>
+      <header className='min-h-80 bg-neutral-900 flex flex-col justify-center items-center content-center'>
+        <div>
+          <p className='text-3xl text-slate-50'>Restaurancy</p>
+        </div>
+
+   <div>
+    <form>
+      <select value = {selectArea} onChange={handleChangeArea} >
+
+        <option value=""> Select by Area </option>
+        {
+          
+          area.map((item, index)=>{
+            return(
+              <option key={index} value={item.strArea}>{item.strArea}</option>
+            )
+          })
+        }
+      </select>
+    </form>
+
       <form>
         <select
           onChange={handleChange}
           value={selectCategory}
-        >
+          >
           <option value="">Select a category</option>
           {listCategories.map((item) => (
             <option key={item.idCategory} value={item.strCategory}>
@@ -67,7 +117,10 @@ export default function Home() {
           ))}
         </select>
       </form>
+      </div>
+    </header>
 
+    <main>
       <section className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-3 container mx-auto">
         {dataCategory.map((item) => (
           <article key={item.idMeal}>
@@ -88,5 +141,6 @@ export default function Home() {
         ))}
       </section>
     </main>
+    </>
   );
 }
